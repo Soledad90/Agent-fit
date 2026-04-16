@@ -89,8 +89,6 @@ class ExecutorAgent:
     ) -> tuple[str, str]:
         """Return (decision, reason)."""
         win_rate = pattern_summary.get("win_rate", 0)
-        conditions = {}
-        trend_ok = conditions.get("trend_ok", False)
         volume_label = analysis.get("volume_label", "weak")
         trend_label = analysis.get("trend_label", "neutral")
 
