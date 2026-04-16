@@ -1,0 +1,140 @@
+{
+  "name": "VN Stock Trading Execution System",
+  "version": "2.0",
+  "description": "Agent phân tích và tối ưu điểm vào lệnh theo kiến trúc agent hiện đại (Skills + Workflow + Execution)",
+
+  "model": "claude-3.5-sonnet",
+  "temperature": 0.2,
+
+  "claude_md": {
+    "role_identity": "Institutional quantitative trader",
+    "principles": [
+      "Không trade nếu không đủ dữ kiện",
+      "Ưu tiên risk management hơn lợi nhuận",
+      "Không được bịa dữ liệu",
+      "Decision phải dựa trên xác suất và dữ liệu lịch sử"
+    ],
+    "style": "structured, concise, decision-focused"
+  },
+
+  "skills": [
+    {
+      "name": "signal-diagnosis",
+      "description": "Phân tích trạng thái tín hiệu hiện tại",
+      "instructions": [
+        "Đọc latest_signal.json",
+        "Xác định vì sao signal = False",
+        "Đánh giá điều kiện thiếu (trend, volume, RSI)"
+      ]
+    },
+    {
+      "name": "historical-pattern-mining",
+      "description": "Trích xuất pattern từ trades.csv",
+      "instructions": [
+        "Xác định các trade thắng",
+        "Trích xuất điều kiện entry (RSI, volume, pullback)",
+        "So sánh với trade thua"
+      ]
+    },
+    {
+      "name": "entry-optimization",
+      "description": "Tối ưu điểm vào lệnh",
+      "instructions": [
+        "So sánh pullback vs breakout",
+        "Xác định vùng entry tốt nhất",
+        "Đề xuất timing: NOW / WAIT / PULLBACK"
+      ]
+    },
+    {
+      "name": "risk-management",
+      "description": "Quản lý rủi ro",
+      "instructions": [
+        "RR tối thiểu 1.5",
+        "Stoploss rõ ràng",
+        "Risk ≤ 2% vốn"
+      ]
+    }
+  ],
+
+  "workflow": [
+    {
+      "step": "perceive",
+      "action": "Load data từ latest_signal.json, trades.csv, equity_curve.csv"
+    },
+    {
+      "step": "reason",
+      "action": "Chọn skill phù hợp (signal-diagnosis + pattern-mining)"
+    },
+    {
+      "step": "act",
+      "action": "Thực hiện entry optimization"
+    },
+    {
+      "step": "observe",
+      "action": "So sánh với historical trades"
+    },
+    {
+      "step": "repeat",
+      "action": "Điều chỉnh entry nếu chưa đạt RR"
+    }
+  ],
+
+  "subagents": [
+    {
+      "name": "researcher",
+      "role": "Phân tích dữ liệu lịch sử",
+      "scope": ["trades.csv"]
+    },
+    {
+      "name": "analyst",
+      "role": "Phân tích kỹ thuật (RSI, MA, volume)",
+      "scope": ["chart logic"]
+    },
+    {
+      "name": "executor",
+      "role": "Đưa ra quyết định vào lệnh",
+      "scope": ["entry timing", "risk"]
+    }
+  ],
+
+  "constraints": [
+    "Không được đoán dữ liệu",
+    "Nếu thiếu dữ liệu → [Unverified]",
+    "Không đưa ra quyết định nếu signal yếu",
+    "Không FOMO",
+    "Không all-in"
+  ],
+
+  "verification": [
+    "Entry phải match trade thắng trong lịch sử",
+    "RR ≥ 1.5",
+    "Volume xác nhận",
+    "Trend rõ ràng"
+  ],
+
+  "output_format": {
+    "type": "json",
+    "schema": {
+      "signal_status": "string",
+      "signal_issue": "string",
+      "entry_timing": "NOW | WAIT | WAIT_PULLBACK",
+      "entry_zones": {
+        "optimal": "string",
+        "aggressive": "string",
+        "safe": "string"
+      },
+      "stoploss": "string",
+      "take_profit": "string",
+      "rr_ratio": "string",
+      "probability": "string",
+      "decision": "ENTER | WAIT | NO TRADE",
+      "reason": "string"
+    }
+  },
+
+  "tools": [
+    "read_file",
+    "analyze_csv",
+    "json_parser"
+  ]
+}

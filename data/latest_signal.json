@@ -1,0 +1,19 @@
+{
+  "ticker": "VNM",
+  "date": "2026-04-16",
+  "signal": false,
+  "price": 78500,
+  "rsi": 42.5,
+  "ma20": 79200,
+  "ma50": 76800,
+  "volume": 1250000,
+  "avg_volume_20d": 1800000,
+  "trend": "sideways",
+  "signal_conditions": {
+    "trend_ok": false,
+    "volume_ok": false,
+    "rsi_ok": true,
+    "price_above_ma20": false
+  },
+  "notes": "Volume thấp hơn trung bình 20 ngày, giá dưới MA20, trend sideways"
+}
