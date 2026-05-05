@@ -292,9 +292,10 @@ class StrategyBuilderSkill:
         entries: list[EntryZone] = []
         price = strategy.current_price
 
-        for i, sup in enumerate(strategy.supports[:2], start=1):
+        for sup in strategy.supports[:2]:
             if sup >= price:
                 continue
+            entry_num = len(entries) + 1
             sl = round(sup * 0.97, -2)  # 3% below support
             tp1 = round(price * 1.03, -2)  # 3% above current price
             tp2 = (
@@ -309,7 +310,7 @@ class StrategyBuilderSkill:
 
             entries.append(
                 EntryZone(
-                    label=f"Entry {i}",
+                    label=f"Entry {entry_num}",
                     price_low=round(sup * 0.99, -2),
                     price_high=round(sup * 1.01, -2),
                     condition="Nến rejection/hammer + volume giảm dần",
