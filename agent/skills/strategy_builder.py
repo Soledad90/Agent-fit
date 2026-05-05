@@ -292,9 +292,8 @@ class StrategyBuilderSkill:
         entries: list[EntryZone] = []
         price = strategy.current_price
 
-        for sup in strategy.supports[:2]:
-            if sup >= price:
-                continue
+        below_price = [s for s in strategy.supports if s < price]
+        for sup in below_price[:2]:
             entry_num = len(entries) + 1
             sl = round(sup * 0.97, -2)  # 3% below support
             tp1 = round(price * 1.03, -2)  # 3% above current price
