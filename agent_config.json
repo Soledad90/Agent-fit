@@ -1,7 +1,7 @@
 {
   "name": "VN Stock Trading Execution System",
-  "version": "2.0",
-  "description": "Agent phân tích và tối ưu điểm vào lệnh theo kiến trúc agent hiện đại (Skills + Workflow + Execution)",
+  "version": "3.0",
+  "description": "Agent phân tích đa khung thời gian (1H/4H/1D/1W) và tối ưu điểm vào lệnh cho MỌI mã cổ phiếu Việt Nam — theo kiến trúc Skills + Workflow + Execution",
 
   "model": "claude-3.5-sonnet",
   "temperature": 0.2,
@@ -53,6 +53,39 @@
         "Stoploss rõ ràng",
         "Risk ≤ 2% vốn"
       ]
+    },
+    {
+      "name": "multi-timeframe-analysis",
+      "description": "Phân tích kỹ thuật đa khung thời gian 1H/4H/1D/1W cho MỌI mã VN",
+      "instructions": [
+        "Top-down: 1W → 1D → 4H → 1H",
+        "Thu thập OHLC, volume, EMA 20/50/200, RSI, MACD mỗi khung",
+        "Xác định hỗ trợ/kháng cự từ nhiều khung",
+        "Đánh giá trend alignment (4/4 = strong, 3/4 = moderate, ≤2 = weak)",
+        "Nguồn: TradingView (HOSE:{TICKER}, HNX:{TICKER}, UPCOM:{TICKER})"
+      ]
+    },
+    {
+      "name": "market-context-analysis",
+      "description": "Phân tích dòng tiền, tin tức, bối cảnh vĩ mô cho MỌI mã VN",
+      "instructions": [
+        "Thu thập dữ liệu giá/volume từ HSX, 24hMoney",
+        "Xác định tỷ lệ mua/bán chủ động → bên nào chiếm ưu thế",
+        "Tổng hợp tin tức ngành/doanh nghiệp từ CafeF, VnExpress",
+        "Đánh giá bối cảnh vĩ mô: VN-Index, DXY, USD/VND, lãi suất, dầu, vàng",
+        "Chấm điểm độ tin cậy tin tức (high/medium/low)"
+      ]
+    },
+    {
+      "name": "strategy-builder",
+      "description": "Tổng hợp phân tích → chiến lược mua/bán cụ thể cho MỌI mã VN",
+      "instructions": [
+        "Kết hợp multi-timeframe + market-context → 3 kịch bản xác suất",
+        "Xác định vùng mua (Entry) + điều kiện xác nhận",
+        "Xác định stop-loss, take-profit, RR ratio",
+        "Đề xuất chiến thuật bán cho người đang giữ",
+        "Output: BUY / OBSERVE / SELL + confidence level"
+      ]
     }
   ],
 
@@ -78,6 +111,61 @@
       "action": "Điều chỉnh entry nếu chưa đạt RR"
     }
   ],
+
+  "analysis_workflow": {
+    "description": "Quy trình phân tích đa khung cho MỌI mã cổ phiếu VN",
+    "timeframes": ["1H", "4H", "1D", "1W"],
+    "steps": [
+      {
+        "step": 1,
+        "name": "multi_timeframe_technical",
+        "skill": "multi-timeframe-analysis",
+        "action": "Top-down: 1W → 1D → 4H → 1H. Thu thập OHLC, indicators, S/R mỗi khung",
+        "data_sources": [
+          "TradingView: HOSE:{TICKER} hoặc HNX:{TICKER}",
+          "Indicators: EMA 20/50/200, RSI(14), MACD(12,26,9), Volume, Bollinger Bands"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "price_volume_flow",
+        "skill": "market-context-analysis",
+        "action": "Lấy dữ liệu giá/volume 5 phiên, tỷ lệ mua/bán chủ động, khối ngoại",
+        "data_sources": [
+          "HSX: https://www.hsx.vn/vi/",
+          "24hMoney: https://24hmoney.vn/stock/{TICKER}/",
+          "CafeF: https://m.cafef.vn/"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "news_analysis",
+        "skill": "market-context-analysis",
+        "action": "Tổng hợp tin tức ngành/doanh nghiệp, KQKD, chính sách, vĩ mô",
+        "data_sources": [
+          "CafeF: https://m.cafef.vn/",
+          "VnExpress: https://vnexpress.net/kinh-doanh",
+          "Dân trí: https://dantri.com.vn/kinh-doanh.htm",
+          "Telegram Quán Tin: https://t.me/s/quantin"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "strategy_synthesis",
+        "skill": "strategy-builder",
+        "action": "Kết hợp tất cả phân tích → chiến lược mua/bán với 3 kịch bản, entry zones, SL/TP"
+      }
+    ],
+    "macro_checklist": [
+      "VN-Index / VN30 — xu hướng chung thị trường",
+      "DXY — chỉ số USD",
+      "USD/VND — tỷ giá",
+      "Lãi suất NHNN / liên ngân hàng",
+      "Giá dầu WTI / Brent",
+      "Giá vàng XAU/USD",
+      "US Markets: SPX, NDQ"
+    ]
+  },
 
   "subagents": [
     {
