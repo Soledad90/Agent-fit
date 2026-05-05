@@ -187,10 +187,10 @@ class MultiTimeframeAnalysisSkill:
         )
 
     @staticmethod
-    def data_sources(ticker: str) -> dict[str, str]:
+    def data_sources(ticker: str, exchange: str = "HOSE") -> dict[str, str]:
         """Return standard data-source URLs for a VN ticker."""
         return {
-            "tradingview": f"https://www.tradingview.com/chart/?symbol=HOSE%3A{ticker}",
+            "tradingview": f"https://www.tradingview.com/chart/?symbol={exchange}%3A{ticker}",
             "hsx": "https://www.hsx.vn/vi/",
             "cafef": "https://m.cafef.vn/",
             "24hmoney": f"https://24hmoney.vn/stock/{ticker}/",

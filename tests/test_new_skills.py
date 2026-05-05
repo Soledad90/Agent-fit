@@ -99,6 +99,17 @@ class TestMultiTimeframeAnalysisSkill:
         assert "hsx" in sources
         assert "cafef" in sources
         assert "HPG" in sources["tradingview"]
+        assert "HOSE" in sources["tradingview"]
+
+    def test_data_sources_hnx_exchange(self) -> None:
+        sources = MultiTimeframeAnalysisSkill.data_sources("SHS", exchange="HNX")
+        assert "HNX" in sources["tradingview"]
+        assert "SHS" in sources["tradingview"]
+        assert "HOSE" not in sources["tradingview"]
+
+    def test_data_sources_upcom_exchange(self) -> None:
+        sources = MultiTimeframeAnalysisSkill.data_sources("BSR", exchange="UPCOM")
+        assert "UPCOM" in sources["tradingview"]
 
     def test_missing_timeframes_handled(self) -> None:
         partial = {"1D": TimeframeSnapshot(timeframe="1D", trend="uptrend")}
