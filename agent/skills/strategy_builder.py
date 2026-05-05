@@ -296,7 +296,7 @@ class StrategyBuilderSkill:
             if sup >= price:
                 continue
             sl = round(sup * 0.97, -2)  # 3% below support
-            tp1 = round(price * 1.0, -2)
+            tp1 = round(price * 1.03, -2)  # 3% above current price
             tp2 = (
                 round(strategy.resistances[0], -2)
                 if strategy.resistances
