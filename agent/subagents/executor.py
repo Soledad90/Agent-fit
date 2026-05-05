@@ -94,11 +94,18 @@ class ExecutorAgent:
 
         reasons: list[str] = []
 
-        # Gate 1: Signal must be active for immediate entry
+        # Gate 1: Signal must be active before any ENTER decision.
+        # Per system constraints ("Không đưa ra quyết định nếu signal yếu"),
+        # an INACTIVE signal can never produce ENTER regardless of downstream gates.
         if signal_status == "INACTIVE":
-            reasons.append(f"Tín hiệu INACTIVE: {optimization.get('reasoning', [])}")
+            reasons.append("Tín hiệu INACTIVE — chưa đủ điều kiện vào lệnh")
             if entry_timing == "NOW":
                 return "WAIT", "Tín hiệu chưa kích hoạt — giữ WAIT dù optimization đề xuất NOW"
+            if entry_timing == "WAIT_PULLBACK":
+                reasons.append("Chờ pullback về vùng entry tối ưu")
+            else:
+                reasons.append("Chờ xác nhận thêm trước khi vào lệnh")
+            return "WAIT", " | ".join(reasons)
 
         # Gate 2: RR must meet minimum threshold
         if not rr_valid:

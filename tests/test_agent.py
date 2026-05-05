@@ -254,8 +254,13 @@ class TestRiskManagementSkill:
         capital = 100_000_000
         entry_zones = {"optimal": "37000", "aggressive": "36260", "safe": "35520"}
         result = skill.run(winning_signal, entry_zones, self._make_win_patterns(), capital=capital)
+        entry_price = 37000.0
+        stoploss = float(result["stoploss"].replace(",", ""))
+        risk_per_share = entry_price - stoploss
         pos_value = float(result["max_position_size"].replace(",", "").replace(" VND", ""))
-        assert pos_value <= capital * 0.02 / (37000 - float(result["stoploss"].replace(",", ""))) * 37000 + 37000
+        # Total risk on the position must not exceed 2% of capital
+        risked_amount = (pos_value / entry_price) * risk_per_share
+        assert risked_amount <= capital * 0.02 + 1e-6
 
 
 # ---------------------------------------------------------------------------

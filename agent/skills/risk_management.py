@@ -91,8 +91,7 @@ class RiskManagementSkill:
         max_shares = int(max_risk_amount / risk_per_share)
         max_position_value = max_shares * entry_price
 
-        # Win probability estimate based on historical win rate
-        win_rate = win_patterns.get("avg_pnl_pct") if win_patterns else None
+        # Win probability estimate based on historical win patterns
         probability = self._estimate_probability(win_patterns)
 
         rr_valid = achieved_rr >= self.MIN_RR
