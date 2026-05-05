@@ -298,11 +298,12 @@ class StrategyBuilderSkill:
             entry_num = len(entries) + 1
             sl = round(sup * 0.97, -2)  # 3% below support
             tp1 = round(price * 1.03, -2)  # 3% above current price
-            tp2 = (
+            res = (
                 round(strategy.resistances[0], -2)
                 if strategy.resistances
                 else round(price * 1.05, -2)
             )
+            tp2 = max(res, round(tp1 * 1.02, -2))
 
             risk = sup - sl
             reward = tp1 - sup
