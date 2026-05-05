@@ -357,15 +357,17 @@ class StrategyBuilderSkill:
         # Strong downtrend + sell flow → OBSERVE
         if trend == "downtrend" and strength in ("strong", "moderate"):
             if flow == "sell_dominant":
+                confidence = "high" if news != "positive" else "medium"
                 return (
                     "OBSERVE",
-                    "high",
+                    confidence,
                     "Xu hướng giảm mạnh + dòng tiền bán > mua. "
                     "Chờ tín hiệu đảo chiều tại vùng hỗ trợ.",
                 )
+            confidence = "medium" if news != "positive" else "low"
             return (
                 "OBSERVE",
-                "medium",
+                confidence,
                 "Xu hướng giảm nhưng dòng tiền chưa quá tiêu cực. "
                 "Theo dõi phản ứng tại hỗ trợ.",
             )
@@ -373,20 +375,36 @@ class StrategyBuilderSkill:
         # Strong uptrend + buy flow → BUY
         if trend == "uptrend" and strength in ("strong", "moderate"):
             if flow == "buy_dominant":
+                confidence = "high" if news != "negative" else "medium"
                 return (
                     "BUY",
-                    "high",
+                    confidence,
                     "Xu hướng tăng mạnh + dòng tiền mua chiếm ưu thế. "
                     "Tích lũy tại vùng pullback.",
                 )
+            confidence = "medium" if news != "negative" else "low"
             return (
                 "BUY",
-                "medium",
+                confidence,
                 "Xu hướng tăng nhưng dòng tiền chưa hoàn toàn xác nhận. "
                 "Mua thận trọng, chia lệnh.",
             )
 
-        # Otherwise → OBSERVE
+        # Otherwise → OBSERVE (news can nudge confidence)
+        if news == "positive":
+            return (
+                "OBSERVE",
+                "medium",
+                "Tín hiệu kỹ thuật chưa rõ nhưng tin tức tích cực. "
+                "Theo dõi breakout.",
+            )
+        if news == "negative":
+            return (
+                "OBSERVE",
+                "low",
+                "Tín hiệu kỹ thuật chưa rõ + tin tức tiêu cực. "
+                "Chờ thêm dữ liệu xác nhận.",
+            )
         return (
             "OBSERVE",
             "low",

@@ -356,6 +356,26 @@ class TestStrategyBuilderSkill:
         )
         assert any("sideway" in s["name"].lower() for s in result["scenarios"])
 
+    def test_news_negative_downgrades_buy_confidence(self) -> None:
+        ctx = self._make_ctx_result("buy_dominant")
+        ctx["news_sentiment_score"] = -0.8  # very negative news
+        result = self.skill.run(
+            "FPT", "HOSE", "2026-05-06", 120000,
+            self._make_tf_result("uptrend"), ctx,
+        )
+        assert result["recommendation"] == "BUY"
+        assert result["confidence"] == "medium"  # downgraded from high
+
+    def test_news_positive_downgrades_observe_confidence(self) -> None:
+        ctx = self._make_ctx_result("sell_dominant")
+        ctx["news_sentiment_score"] = 0.8  # very positive news
+        result = self.skill.run(
+            "ACB", "HOSE", "2026-05-06", 22600,
+            self._make_tf_result("downtrend"), ctx,
+        )
+        assert result["recommendation"] == "OBSERVE"
+        assert result["confidence"] == "medium"  # downgraded from high
+
     def test_trend_fields_populated(self) -> None:
         result = self.skill.run(
             "ACB", "HOSE", "2026-05-06", 22600,
